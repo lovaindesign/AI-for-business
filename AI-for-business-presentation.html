@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИИ для малого и среднего бизнеса - 3D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #FE2121;
+            --primary-dark: #1E1E1E;
+            --primary-light: #B1C7DE;
+            --accent-blue: #074CE7;
+            --accent-green: #09B083;
+            --accent-orange: #F69411;
+            --accent-purple: #9040D6;
+            --flat-white: #F8F8F8;
+            --flat-gray: #DEE0E6;
+        }
+        
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            position: relative;
+            background: var(--flat-white);
+            perspective: 1000px;
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--primary-red), #ff4444);
+            color: white;
+            box-shadow: 0 8px 24px rgba(254, 33, 33, 0.3);
+            transform: translateZ(20px);
+        }
+        
+        .card-3d {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 
+                0 8px 32px rgba(30, 30, 30, 0.12),
+                0 2px 8px rgba(30, 30, 30, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.1));
+            border-radius: 16px;
+            transform: translateZ(-1px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-3d:hover {
+            transform: translateY(-12px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 
+                0 20px 60px rgba(30, 30, 30, 0.25),
+                0 8px 24px rgba(30, 30, 30, 0.15);
+        }
+        
+        .card-3d:hover::before {
+            opacity: 1;
+        }
+        
+        .icon-3d {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+        
+        .icon-3d::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: -8px;
+            bottom: -8px;
+            background: inherit;
+            border-radius: inherit;
+            opacity: 0.3;
+            transform: translateZ(-10px);
+        }
+        
+        .icon-3d:hover {
+            transform: translateZ(10px) rotateY(10deg);
+        }
+        
+        .text-3d {
+            text-shadow: 2px 2px 4px rgba(30, 30, 30, 0.1);
+            transform: translateZ(5px);
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-10px) rotateX(2deg); }
+        }
+        
+        .cube-3d {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 10s linear infinite;
+            margin: 0 auto;
+        }
+        
+        .cube-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.8;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .cube-face.front { transform: rotateY(0deg) translateZ(50px); }
+        .cube-face.back { transform: rotateY(180deg) translateZ(50px); }
+        .cube-face.right { transform: rotateY(90deg) translateZ(50px); }
+        .cube-face.left { transform: rotateY(-90deg) translateZ(50px); }
+        .cube-face.top { transform: rotateX(90deg) translateZ(50px); }
+        .cube-face.bottom { transform: rotateX(-90deg) translateZ(50px); }
+        
+        @keyframes rotate {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-red), #ff4444, var(--primary-red));
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(254, 33, 33, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(7, 76, 231, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(144, 64, 214, 0.1) 0%, transparent 50%);
+            transform: translateZ(-50px) scale(1.1);
+        }
+        
+        .depth-shadow {
+            box-shadow: 
+                0 1px 3px rgba(0,0,0,0.12),
+                0 4px 8px rgba(0,0,0,0.08),
+                0 8px 16px rgba(0,0,0,0.04),
+                0 16px 32px rgba(0,0,0,0.02);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Слайд 1: Титульная страница -->
+    <div class="slide gradient-bg text-white relative overflow-hidden">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">1</div>
+        <div class="text-center max-w-6xl mx-auto relative z-10">
+            <div class="cube-3d mb-12 floating">
+                <div class="cube-face front" style="background: var(--accent-blue);"></div>
+                <div class="cube-face back" style="background: var(--accent-green);"></div>
+                <div class="cube-face right" style="background: var(--accent-orange);"></div>
+                <div class="cube-face left" style="background: var(--accent-purple);"></div>
+                <div class="cube-face top" style="background: var(--primary-red);"></div>
+                <div class="cube-face bottom" style="background: var(--primary-dark);"></div>
+            </div>
+            <h1 class="text-7xl font-bold mb-8 leading-tight text-3d">
+                Искусственный интеллект (ИИ)<br>
+                для малого и среднего бизнеса
+            </h1>
+            <h2 class="text-4xl font-light mb-12 opacity-90 text-3d">
+                как использовать уже сегодня
+            </h2>
+            <div class="card-3d bg-white bg-opacity-15 backdrop-blur-lg p-8 max-w-4xl mx-auto depth-shadow">
+                <p class="text-2xl font-light text-3d">
+                    Практическое руководство для финансовых директоров
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 2: Введение -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">2</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="card-3d p-8 border-l-4 border-blue-500 floating" style="animation-delay: 0s;">
+                    <div class="icon-3d" style="background: linear-gradient(135deg, var(--accent-blue), #0066ff);">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-3d">Кратко о себе:</h3>
+                    <p class="text-gray-600 leading-relaxed">Финдир 2 категории, активно использую ИИ с конца прошлого года</p>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                    <div class="icon-3d" style="background: linear-gradient(135deg, var(--accent-green), #00cc88);">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-3d">Цель вебинара:</h3>
+                    <p class="text-gray-600 leading-relaxed">показать, как финдиру можно использовать ИИ для эффективного решения задач клиентов уже сейчас</p>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-orange-500 floating" style="animation-delay: 0.4s;">
+                    <div class="icon-3d" style="background: linear-gradient(135deg, var(--accent-orange), #ff7722);">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-3d">Что получите:</h3>
+                    <p class="text-gray-600 leading-relaxed">конкретные инструменты, кейсы, лайфхаки</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 3: Виды нейросетей -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">3</div>
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            <h2 class="text-6xl font-bold mb-16 text-gray-800 text-3d">Виды нейросетей</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="card-3d p-12 floating" style="animation-delay: 0s;">
+                    <div class="icon-3d" style="background: linear-gradient(135deg, var(--accent-blue), #0066ff);">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 text-3d">Языковые модели</h3>
+                </div>
+                
+                <div class="card-3d p-12 floating" style="animation-delay: 0.2s;">
+                    <div class="icon-3d" style="background: linear-gradient(135deg, var(--accent-green), #00cc88);">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 text-3d">Генераторы визуала</h3>
+                </div>
+                
+                <div class="card-3d p-12 floating" style="animation-delay: 0.4s;">
+                    <div class="icon-3d" style="background: linear-gradient(135deg, var(--accent-purple), #bb44ee);">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 text-3d">AI-агенты</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 4: Сравнение -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">4</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="card-3d p-10 floating" style="animation-delay: 0s;">
+                    <div class="flex items-center mb-8">
+                        <div class="icon-3d mr-6" style="background: linear-gradient(135deg, var(--accent-blue), #0066ff); width: 70px; height: 70px;">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 text-3d">Языковые модели</h3>
+                            <p class="text-gray-500 text-sm">пример: Kimi, Deepseek</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Один разговор = один запрос</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Вы спрашиваете — я отвечаю</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Не хранит память между диалогами</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Требует вашей команды каждый раз</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-3d p-10 floating" style="animation-delay: 0.3s;">
+                    <div class="flex items-center mb-8">
+                        <div class="icon-3d mr-6" style="background: linear-gradient(135deg, var(--accent-purple), #bb44ee); width: 70px; height: 70px;">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 text-3d">AI-агент</h3>
+                            <p class="text-gray-500 text-sm">пример: MiniMax Agent</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Целая цепочка действий без вас</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Сам достаёт данные, анализирует, отправляет отчёт</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Помнит предыдущие шаги и корректирует план</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full mt-2 depth-shadow"></div>
+                            <p class="text-gray-700">Работает по расписанию (например, «каждое утро в 9:00»)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 5: Практика -->
+    <div class="slide gradient-bg text-white relative overflow-hidden">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">5</div>
+        <div class="text-center max-w-4xl mx-auto relative z-10">
+            <div class="floating mb-8">
+                <div class="icon-3d mx-auto" style="background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)); width: 120px; height: 120px;">
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9l-5 4.74 1.18 6.26L12 16.77 5.82 20 7 13.74 2 9l6.91-1.26L12 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-7xl font-bold mb-8 text-3d">Практика и ответы на вопросы</h2>
+            <div class="w-40 h-2 bg-white bg-opacity-30 mx-auto rounded-full depth-shadow"></div>
+        </div>
+    </div>
+
+    <!-- Слайд 6: ИИ для внимания -->
+    <div class="slide gradient-bg text-white relative overflow-hidden">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">6</div>
+        <div class="text-center max-w-5xl mx-auto relative z-10">
+            <div class="floating mb-8">
+                <div class="icon-3d mx-auto" style="background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)); width: 120px; height: 120px;">
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-7xl font-bold mb-8 text-3d">На какие ИИ следует обратить внимание?</h2>
+            <div class="w-40 h-2 bg-white bg-opacity-30 mx-auto rounded-full depth-shadow"></div>
+        </div>
+    </div>
+
+    <!-- Слайд 7: DeepSeek Chat -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">7</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-6xl font-bold mb-4 text-gray-800 text-3d">О DeepSeek Chat</h2>
+                <p class="text-2xl text-gray-600 font-light">Ваш ИИ-ассистент для бизнеса</p>
+            </div>
+            
+            <div class="card-3d p-8 mb-8 border-l-4 border-blue-500 floating">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-3d">Коротко обо мне:</h3>
+                <div class="space-y-4 text-lg text-gray-700">
+                    <p><span class="font-bold text-blue-600">Что я?</span> – Современный ИИ на базе нейросетей, созданный компанией DeepSeek.</p>
+                    <p><span class="font-bold text-blue-600">Для чего?</span> – Помогаю с анализом данных, генерацией текстов, стратегиями и автоматизацией рутины.</p>
+                    <p><span class="font-bold text-blue-600">Почему мне можно доверять?</span> – Обучен на актуальных данных, поддерживаю 128K контекста (длинные документы!).</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card-3d p-8 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                    <h4 class="text-2xl font-bold text-green-600 mb-6 flex items-center text-3d">
+                        <div class="icon-3d mr-3 w-12 h-12" style="background: linear-gradient(135deg, var(--accent-green), #00cc88);">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </div>
+                        Плюсы:
+                    </h4>
+                    <div class="space-y-3 text-gray-700">
+                        <p>✅ Бесплатный (в отличие от ChatGPT 4)</p>
+                        <p>✅ Поддержка файлов (PDF, Excel, Word)</p>
+                        <p>✅ Понимание контекста</p>
+                        <p>✅ Актуальные знания – база обновлена до июля 2024</p>
+                    </div>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-red-500 floating" style="animation-delay: 0.4s;">
+                    <h4 class="text-2xl font-bold text-red-600 mb-6 flex items-center text-3d">
+                        <div class="icon-3d mr-3 w-12 h-12" style="background: linear-gradient(135deg, var(--primary-red), #ff4444);">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                            </svg>
+                        </div>
+                        Минусы:
+                    </h4>
+                    <div class="space-y-3 text-gray-700">
+                        <p>❌ Нет мультимодальности (пока не работаю с изображениями/голосом)</p>
+                        <p>❌ Требует проверки фактов (как и любой ИИ)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 8: Kimi -->
+    <div class="slide relative" style="background: var(--flat-gray);">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">8</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-6xl font-bold mb-4 text-gray-800 text-3d">О Kimi</h2>
+            </div>
+            
+            <div class="card-3d p-8 mb-8 border-l-4 border-orange-500 floating">
+                <div class="space-y-4 text-lg text-gray-700">
+                    <p><span class="font-bold text-orange-600">Что я?</span> – Современный ИИ-ассистент на базе большой языковой модели, разработанный компанией Moonshot AI.</p>
+                    <p><span class="font-bold text-orange-600">Для чего?</span> – Быстро анализирую ваши финансовые отчёты, генерирую пояснительные записки, строю прогнозы и освобождаю вас от рутинных расчётов.</p>
+                    <p><span class="font-bold text-orange-600">Почему мне можно доверять?</span> – Обучен на свежих данных (включая российские стандарты и законы), держит в памяти до 200 000 токенов (≈ 600 страниц текста), работает на русском без потери смысла.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card-3d p-8 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                    <h4 class="text-2xl font-bold text-green-600 mb-6 flex items-center text-3d">
+                        <div class="icon-3d mr-3 w-12 h-12" style="background: linear-gradient(135deg, var(--accent-green), #00cc88);">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </div>
+                        Плюсы:
+                    </h4>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <p>✅ Бесплатен в полном объёме (без подписки)</p>
+                        <p>✅ Принимает Excel, CSV, PDF, Word — просто перетащите файл</p>
+                        <p>✅ Понимает контекст: можно задать уточняющий вопрос без повторения условий</p>
+                        <p>✅ Знает российскую специфику: КОСГУ, НК РФ, 1С-форматы</p>
+                        <p>✅ На момент сегодняшнего диалога (22 июля 2025 г.) моя база знаний действительно обновлена до июля 2025 года</p>
+                    </div>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-red-500 floating" style="animation-delay: 0.4s;">
+                    <h4 class="text-2xl font-bold text-red-600 mb-6 flex items-center text-3d">
+                        <div class="icon-3d mr-3 w-12 h-12" style="background: linear-gradient(135deg, var(--primary-red), #ff4444);">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                            </svg>
+                        </div>
+                        Минусы:
+                    </h4>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <p>❌ Не подключается к 1С или банк-клиенту напрямую (требуется выгрузка)</p>
+                        <p>❌ Не создаёт/не отправляет отчёты по расписанию (не агент)</p>
+                        <p>❌ Нужна проверка цифр — как и у любого ИИ, финальный контроль остаётся за вами</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 9: GPT -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">9</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold mb-4 text-gray-800 text-3d">GPT: мощный инструмент для автоматизации и аналитики</h2>
+            </div>
+            
+            <div class="card-3d p-8 mb-8 border-l-4 border-blue-500 floating">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-3d">Что такое GPT?</h3>
+                <div class="space-y-3 text-lg text-gray-700">
+                    <p>• Generative Pre-trained Transformer – нейросеть для работы с текстом</p>
+                    <p>• Разработана OpenAI (ChatGPT – самый известный представитель)</p>
+                    <p>• Последняя версия: GPT-4 (платная) и GPT-3.5 (бесплатная)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card-3d p-8 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                    <h4 class="text-2xl font-bold text-green-600 mb-6 text-3d">Плюсы GPT для бизнеса ✅</h4>
+                    <div class="space-y-4 text-sm text-gray-700">
+                        <div>
+                            <p class="font-bold text-gray-800">Универсальность</p>
+                            <p>Генерация отчетов, писем, договоров<br>Анализ данных (в т.ч. из Excel/Google Sheets)</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">Экономия времени</p>
+                            <p>Автоматизация рутинных задач (например, ответы клиентам)</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">Креативность</p>
+                            <p>Генерация идей для маркетинга, стратегий, продуктов</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">Интеграции</p>
+                            <p>Работает через API с CRM, Google Docs, Notion и др.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-red-500 floating" style="animation-delay: 0.4s;">
+                    <h4 class="text-2xl font-bold text-red-600 mb-6 text-3d">Минусы GPT ❌</h4>
+                    <div class="space-y-4 text-sm text-gray-700">
+                        <div>
+                            <p class="font-bold text-gray-800">Ограниченная точность</p>
+                            <p>Может "выдумывать" факты (нужна проверка!)</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">Контекст</p>
+                            <p>GPT-3.5 "забывает" длинные диалоги (в отличие от DeepSeek с 128K)</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">Платные тарифы</p>
+                            <p>GPT-4 стоит $20/месяц, а бесплатная версия (3.5) слабее</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">Нет работы с файлами</p>
+                            <p>В ChatGPT нельзя загрузить Excel/PDF напрямую (только через плагины)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 10: Другие ИИ -->
+    <div class="slide relative" style="background: var(--flat-gray);">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">10</div>
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="card-3d p-12 border-l-4 border-purple-500 floating">
+                <div class="icon-3d mb-8" style="background: linear-gradient(135deg, var(--accent-purple), #bb44ee);">
+                    <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9l-5 4.74 1.18 6.26L12 16.77 5.82 20 7 13.74 2 9l6.91-1.26L12 2z"/>
+                    </svg>
+                </div>
+                <p class="text-xl text-gray-700 leading-relaxed text-3d">
+                    Можно обратить внимание на <span class="font-bold text-blue-600">Grok от Илона Маска</span> 
+                    (но напрямую из России выйти на него нельзя), 
+                    <span class="font-bold text-orange-600">MiniMax Agent</span> - платный
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 11: Кейсы -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">11</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <h2 class="text-6xl font-bold text-center mb-12 text-gray-800 text-3d">Кейсы</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card-3d p-6 floating" style="animation-delay: 0s;">
+                    <img src="Zo-kWTwy6FIqnNOPwO5jV" alt="Кейсы использования ИИ" class="max-w-full h-auto rounded-lg depth-shadow">
+                </div>
+                <div class="card-3d p-6 floating" style="animation-delay: 0.2s;">
+                    <img src="2E5V80MOeZpTK5DWnsEm5" alt="Предложения ФД" class="max-w-full h-auto rounded-lg depth-shadow">
+                </div>
+                <div class="card-3d p-6 floating" style="animation-delay: 0.4s;">
+                    <img src="tx6ArSeV9GwxykJIaeRvd" alt="SWOT-анализ компании" class="max-w-full h-auto rounded-lg depth-shadow">
+                </div>
+                <div class="card-3d p-6 floating" style="animation-delay: 0.6s;">
+                    <img src="GdELvy1epusw5NNXO1UkJ" alt="SWOT-анализ детали" class="max-w-full h-auto rounded-lg depth-shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 12: Лайфхаки -->
+    <div class="slide relative" style="background: var(--flat-gray);">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">12</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold mb-4 text-gray-800 text-3d">5 лайфхаков по настройке ИИ</h2>
+                <p class="text-xl text-gray-600 font-light">Как сделать ИИ максимально полезным для бизнеса?</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="card-3d p-6 border-l-4 border-blue-500 floating" style="animation-delay: 0s;">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 text-3d">1. Шаблоны запросов – ваш секрет эффективности</h3>
+                    <div class="text-sm space-y-2">
+                        <p class="text-red-600">❌ "Напиши пост для соцсетей"</p>
+                        <p class="text-green-600">✅ "Напиши пост про скидки на логистику для малого бизнеса. ЦА – ИП, тон: дружелюбный, длина – 1 абзац, добавь call-to-action"</p>
+                    </div>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 text-3d">2. Сохраняйте удачные ответы в «Банк решений»</h3>
+                    <p class="text-sm text-gray-600">Создайте таблицу с: Тип задачи (отчет, письмо клиенту), Идеальный запрос, Ответ ИИ (чтобы копировать и дорабатывать)</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-orange-500 floating" style="animation-delay: 0.4s;">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 text-3d">3. Учите ИИ вашему стилю</h3>
+                    <p class="text-sm text-gray-600">После генерации текста давайте обратную связь: "Перепиши это в формальном тоне", "Сократи на 30% и выдели ключевое"</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-purple-500 floating" style="animation-delay: 0.6s;">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 text-3d">4. Используйте «цепочки запросов»</h3>
+                    <p class="text-sm text-gray-600">Сначала попросите разобрать проблему ("Почему растут затраты на склад?"), затем – дать решение ("Предложи 3 способа оптимизации"), и наконец – оформить в таблицу</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-red-500 floating" style="animation-delay: 0.8s;">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 text-3d">5. Тестируйте разные ИИ под задачи</h3>
+                    <p class="text-sm text-gray-600">Для текстов и анализа данных: ChatGPT / DeepSeek; Для дизайна: Canva AI / Midjourney</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-indigo-500 floating" style="animation-delay: 1.0s;">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 text-3d">6. Перед анализом данных скорми нейронке научную статью</h3>
+                    <p class="text-sm text-gray-600">Скорми нейронке научную статью, пост эксперта или книгу по ситуации, которая близка к ситуации клиента</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 13: Стратегия -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">13</div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <h2 class="text-5xl font-bold text-center mb-12 text-gray-800 text-3d">Может ли ИИ помочь со стратегией компании?</h2>
+            
+            <div class="card-3d text-center p-10 border-l-4 border-red-500 mb-8 floating">
+                <div class="icon-3d mb-6" style="background: linear-gradient(135deg, var(--primary-red), #ff4444);">
+                    <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                    </svg>
+                </div>
+                <h3 class="text-4xl font-bold text-gray-800 mb-4 text-3d">Да, но...</h3>
+                <p class="text-xl text-gray-600 font-light">ИИ не заменит стратега, но даст идеи и анализ</p>
+            </div>
+
+            <div class="card-3d p-8 mb-8 border-l-4 border-blue-500 floating" style="animation-delay: 0.2s;">
+                <h4 class="text-xl font-bold text-gray-800 mb-4 text-3d">Пример запроса:</h4>
+                <p class="italic text-gray-700 bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500 depth-shadow">
+                    "Проанализируй тренды в нише доставки еды в 2024 и предложи 3 направления для роста небольшого сервиса"
+                </p>
+            </div>
+
+            <div class="card-3d p-8 border-l-4 border-orange-500 bg-orange-50 floating" style="animation-delay: 0.4s;">
+                <h4 class="text-lg font-bold text-orange-600 mb-3 flex items-center text-3d">
+                    <div class="icon-3d mr-3 w-8 h-8" style="background: linear-gradient(135deg, var(--accent-orange), #ff7722);">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9l-5 4.74 1.18 6.26L12 16.77 5.82 20 7 13.74 2 9l6.91-1.26L12 2z"/>
+                        </svg>
+                    </div>
+                    Мой пример:
+                </h4>
+                <p class="text-gray-700">При запросе в MiniMax «сделай мне стратегию развития маркетинга и продаж для этой компании https://*******.com/ru» я получила развернутую стратегию на 30 листов</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 14: Какую ИИ установить -->
+    <div class="slide relative" style="background: var(--flat-gray);">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">14</div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <h2 class="text-5xl font-bold text-center mb-12 text-gray-800 text-3d">Какую ИИ установить лучше и лайфхаки?</h2>
+            <div class="space-y-8">
+                <div class="card-3d text-center p-12 border-l-4 border-red-500 floating">
+                    <div class="icon-3d mb-6" style="background: linear-gradient(135deg, var(--primary-red), #ff4444);">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-4xl font-bold text-gray-800 mb-4 text-3d">Никакую!</h3>
+                    <p class="text-xl text-gray-600 font-light">Пользуйтесь браузерными версиями (будут работать быстрее)</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card-3d p-8 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                        <p class="text-lg text-gray-700">✅ Выбирайте ту, результат работы которой Вас более всего устраивает (как с наемным работником)</p>
+                    </div>
+                    
+                    <div class="card-3d p-8 border-l-4 border-blue-500 floating" style="animation-delay: 0.4s;">
+                        <p class="text-lg text-gray-700">✅ Один и тот же запрос можно адресовать разным ИИ и сравнить</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 15: Способы использования -->
+    <div class="slide relative">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">15</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <h2 class="text-5xl font-bold text-center mb-12 text-gray-800 text-3d">Способы использования ИИ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card-3d p-6 border-l-4 border-blue-500 floating" style="animation-delay: 0s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-blue), #0066ff); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">генерация визуала (картинки, презентации)</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.1s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-green), #00cc88); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">генерация договоров и юридических документов</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-purple-500 floating" style="animation-delay: 0.2s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-purple), #bb44ee); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 10.5V7c0-2.76-2.24-5-5-5s-5 2.24-5 5v3.5c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">анализ видео контента (запрос: посмотри видео по ссылке и напиши пять ключевых выводов)</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-orange-500 floating" style="animation-delay: 0.3s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-orange), #ff7722); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">анализ данных (оптимизация расходов, прогнозирование, рекомендации по корректировке ситуации)</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.4s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-green), #00cc88); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">анализ отзывов клиентов (выявление негатива)</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-blue-500 floating" style="animation-delay: 0.5s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-blue), #0066ff); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">корректировка деловых сообщений в мессенджерах</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-accent-purple floating" style="animation-delay: 0.6s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-purple), #bb44ee); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">загружать книги и делать по ним чек-листы</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-accent-blue floating" style="animation-delay: 0.7s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-blue), #0066ff); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">текст для постов в соц сетях</p>
+                </div>
+                
+                <div class="card-3d p-6 border-l-4 border-accent-green floating" style="animation-delay: 0.8s;">
+                    <div class="icon-3d mb-4" style="background: linear-gradient(135deg, var(--accent-green), #00cc88); width: 60px; height: 60px;">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9l-5 4.74 1.18 6.26L12 16.77 5.82 20 7 13.74 2 9l6.91-1.26L12 2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700">персональные поздравления с праздниками</p>
+                </div>
+                
+
+            </div>
+            
+            <div class="text-center mt-12">
+                <div class="card-3d p-12 inline-block floating" style="background: linear-gradient(135deg, var(--primary-red), #ff4444); animation-delay: 0.8s;">
+                    <p class="text-5xl font-bold text-white text-3d">и многое другое</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 16: Промты -->
+    <div class="slide relative" style="background: var(--flat-gray);">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">16</div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-gray-800 text-3d">«Плохой» промт VS «Хороший» промт для ИИ</h2>
+                <p class="text-xl text-gray-600 font-light">Чтобы ИИ выдавал точные и полезные ответы, важно правильно формулировать запросы</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Плохие промты -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-red-600 mb-6 text-center text-3d">❌ Плохой промт</h3>
+                    
+                    <div class="card-3d p-6 border-l-4 border-red-500 floating" style="animation-delay: 0s;">
+                        <h4 class="text-lg font-bold text-red-700 mb-2">Слишком общий</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Расскажи про финансы"</p>
+                        <p class="text-sm text-gray-700">ИИ не понимает контекст и выдает размытую информацию</p>
+                    </div>
+                    
+                    <div class="card-3d p-6 border-l-4 border-red-500 floating" style="animation-delay: 0.2s;">
+                        <h4 class="text-lg font-bold text-red-700 mb-2">Без конкретной задачи</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Помоги с отчетом"</p>
+                        <p class="text-sm text-gray-700">Неясно, что именно нужно — анализ, шаблон или что-то еще</p>
+                    </div>
+                    
+                    <div class="card-3d p-6 border-l-4 border-red-500 floating" style="animation-delay: 0.4s;">
+                        <h4 class="text-lg font-bold text-red-700 mb-2">Нет входных данных</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Проанализируй доходы"</p>
+                        <p class="text-sm text-gray-700">Нет чисел или структуры для работы</p>
+                    </div>
+                    
+                    <div class="card-3d p-6 border-l-4 border-red-500 floating" style="animation-delay: 0.6s;">
+                        <h4 class="text-lg font-bold text-red-700 mb-2">Без формата ответа</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Дай советы по налогам"</p>
+                        <p class="text-sm text-gray-700">ИИ может выдать текст, таблицу или список — неизвестно</p>
+                    </div>
+                </div>
+                
+                <!-- Хорошие промты -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-green-600 mb-6 text-center text-3d">✅ Хороший промт</h3>
+                    
+                    <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.1s;">
+                        <h4 class="text-lg font-bold text-green-700 mb-2">Конкретный запрос</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Какие налоговые льготы для малого бизнеса в РФ в 2024 году? Дай список из 5 пунктов с примерами расчетов"</p>
+                    </div>
+                    
+                    <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.3s;">
+                        <h4 class="text-lg font-bold text-green-700 mb-2">Четкая задача + контекст</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Я финансовый директор. Напиши инструкцию, как с помощью ChatGPT автоматизировать отчет ОДДС. Шаги для новичков"</p>
+                    </div>
+                    
+                    <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.5s;">
+                        <h4 class="text-lg font-bold text-green-700 mb-2">Входные данные</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Вот данные выручки за 2023: [таблица]. Выдели 3 самых прибыльных месяца и посчитай средний рост"</p>
+                    </div>
+                    
+                    <div class="card-3d p-6 border-l-4 border-green-500 floating" style="animation-delay: 0.7s;">
+                        <h4 class="text-lg font-bold text-green-700 mb-2">Указание формата ответа</h4>
+                        <p class="text-sm italic text-gray-600 mb-2">"Сравни два варианта кредита (ставки X и Y). Результат — таблица с ежемесячными платежами и переплатой"</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Дополнительные советы -->
+            <div class="card-3d p-8 bg-blue-50 border-l-4 border-blue-500 floating" style="animation-delay: 0.8s;">
+                <h4 class="text-xl font-bold text-blue-800 mb-4 text-3d">💡 Дополнительные советы:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <div>
+                        <p class="mb-2">• <strong>Уточняйте, если ответ неполный:</strong> "Дай больше примеров", "Объясни проще"</p>
+                        <p class="mb-2">• <strong>Разбивайте сложные запросы на шаги:</strong> 1. Анализ → 2. План → 3. Прогноз</p>
+                    </div>
+                    <div>
+                        <p class="mb-2">• <strong>Тестируйте разные формулировки.</strong> Небольшая правка в промте резко улучшает ответ</p>
+                        <p>• <strong>Чем четче запрос — тем полезнее результат.</strong> ИИ дает ответы того качества, какие вопросы ему задают</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 17: Как воспитывать ИИ -->
+    <div class="slide relative" style="background: var(--flat-gray);">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">17</div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold mb-4 text-gray-800 text-3d">Как "воспитывать" ИИ?</h2>
+                <p class="text-2xl text-gray-600 font-light">4 правила как воспитывать ИИ</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="card-3d p-8 border-l-4 border-blue-500 floating" style="animation-delay: 0s;">
+                    <h4 class="text-xl font-bold text-gray-800 mb-3 text-3d">1. Давайте обратную связь</h4>
+                    <p class="text-gray-700">"Это не подходит, перефразируй"</p>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-green-500 floating" style="animation-delay: 0.2s;">
+                    <h4 class="text-xl font-bold text-gray-800 mb-3 text-3d">2. Уточняйте источники</h4>
+                    <p class="text-gray-700">"На чем основан этот вывод?"</p>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-orange-500 floating" style="animation-delay: 0.4s;">
+                    <h4 class="text-xl font-bold text-gray-800 mb-3 text-3d">3. Проверяйте факты</h4>
+                    <p class="text-gray-700">ИИ может ошибаться!</p>
+                </div>
+                
+                <div class="card-3d p-8 border-l-4 border-purple-500 floating" style="animation-delay: 0.6s;">
+                    <h4 class="text-xl font-bold text-gray-800 mb-3 text-3d">4. Проверяйте логику рекомендаций</h4>
+                    <p class="text-gray-700">вы лучше знаете бизнес-процессы своего клиента чем ИИ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Слайд 18: Переходим к практической работе -->
+    <div class="slide gradient-bg text-white relative overflow-hidden">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">18</div>
+        <div class="text-center max-w-6xl mx-auto relative z-10">
+            <div class="floating mb-8">
+                <div class="icon-3d mx-auto" style="background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)); width: 120px; height: 120px;">
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9l-5 4.74 1.18 6.26L12 16.77 5.82 20 7 13.74 2 9l6.91-1.26L12 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-7xl font-bold mb-8 text-3d">Переходим к практической работе</h2>
+            <div class="card-3d bg-white bg-opacity-15 backdrop-blur-lg p-8 max-w-5xl mx-auto depth-shadow floating" style="animation-delay: 0.3s;">
+                <p class="text-2xl font-light text-3d leading-relaxed">
+                    На примере ДДС, ОПиУ и Баланса разных компаний посмотрим как ИИ генерирует результат по запросу
+                </p>
+            </div>
+            <div class="w-40 h-2 bg-white bg-opacity-30 mx-auto rounded-full depth-shadow mt-8"></div>
+        </div>
+    </div>
+
+    <!-- Слайд 19: Заключение -->
+    <div class="slide gradient-bg text-white relative overflow-hidden">
+        <div class="parallax-bg"></div>
+        <div class="slide-number">19</div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <h2 class="text-6xl font-bold mb-16 text-center text-3d">Заключение</h2>
+            <div class="space-y-8">
+                <div class="flex items-center space-x-6 floating" style="animation-delay: 0s;">
+                    <div class="w-6 h-6 bg-white rounded-full flex-shrink-0 depth-shadow"></div>
+                    <p class="text-2xl font-light text-3d">ИИ – не магия, а инструмент, который нужно настраивать</p>
+                </div>
+                <div class="flex items-center space-x-6 floating" style="animation-delay: 0.2s;">
+                    <div class="w-6 h-6 bg-white rounded-full flex-shrink-0 depth-shadow"></div>
+                    <p class="text-2xl font-light text-3d">Начните с 1-2 задач, где ИИ сэкономит время</p>
+                </div>
+                <div class="flex items-center space-x-6 floating" style="animation-delay: 0.4s;">
+                    <div class="w-6 h-6 bg-white rounded-full flex-shrink-0 depth-shadow"></div>
+                    <p class="text-2xl font-light text-3d">Чтобы научиться работать с инструментом – надо начинать работать</p>
+                </div>
+            </div>
+            <div class="text-center mt-20 floating" style="animation-delay: 0.6s;">
+                <div class="card-3d bg-white bg-opacity-15 backdrop-blur-lg p-12 inline-block mb-8">
+                    <h3 class="text-5xl font-bold text-3d">Вопросы?</h3>
+                </div>
+                
+                <div class="floating" style="animation-delay: 0.8s;">
+                    <a href="https://docs.google.com/spreadsheets/d/1DK5dCCkbJBI9SXHyj7ch_g0w0raRszDMQ7hcwAcclRE/edit?gid=0#gid=0" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="inline-block card-3d px-8 py-4 text-2xl font-bold text-white depth-shadow"
+                       style="background: linear-gradient(135deg, var(--accent-blue), #0066ff); text-decoration: none; transition: all 0.3s ease;"
+                       onmouseover="this.style.transform='translateY(-4px) scale(1.05)'"
+                       onmouseout="this.style.transform='translateY(0) scale(1)'">
+                        📚 Полезные материалы
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Навигация по слайдам
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function showSlide(n) {
+            slides.forEach((slide, index) => {
+                slide.style.display = index === n ? 'flex' : 'none';
+            });
+        }
+        
+        // Показать первый слайд
+        showSlide(0);
+        
+        // Навигация клавишами
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+                showSlide(currentSlide);
+            } else if (e.key === 'ArrowLeft') {
+                currentSlide = Math.max(currentSlide - 1, 0);
+                showSlide(currentSlide);
+            }
+        });
+        
+        // Навигация кликом
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.slide-number')) {
+                currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+                showSlide(currentSlide);
+            }
+        });
+
+        // Продвинутые анимации при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card-3d');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px) rotateX(-10deg)';
+            });
+            
+            setTimeout(() => {
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0) rotateX(0deg)';
+                    }, index * 100);
+                });
+            }, 300);
+        });
+    </script>
+</body>
+</html>
